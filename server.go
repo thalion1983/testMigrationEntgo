@@ -92,9 +92,11 @@ func main() {
 	defer client.Close()
 
 	ctx := context.Background()
+	/*
 	if err := client.Schema.Create(ctx); err != nil {
 		log.Fatalf("failed creating ORM resources: %v", err)
 	}
+	*/
 
 	if err := seed(ctx, client); err != nil {
 		log.Fatalf("failed seeding data: %v", err)
