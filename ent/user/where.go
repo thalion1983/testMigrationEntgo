@@ -69,6 +69,11 @@ func Title(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldTitle, v))
 }
 
+// Followers applies equality check predicate on the "followers" field. It's identical to FollowersEQ.
+func Followers(v int) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldFollowers, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldName, v))
@@ -272,6 +277,56 @@ func TitleEqualFold(v string) predicate.User {
 // TitleContainsFold applies the ContainsFold predicate on the "title" field.
 func TitleContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldTitle, v))
+}
+
+// FollowersEQ applies the EQ predicate on the "followers" field.
+func FollowersEQ(v int) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldFollowers, v))
+}
+
+// FollowersNEQ applies the NEQ predicate on the "followers" field.
+func FollowersNEQ(v int) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldFollowers, v))
+}
+
+// FollowersIn applies the In predicate on the "followers" field.
+func FollowersIn(vs ...int) predicate.User {
+	return predicate.User(sql.FieldIn(FieldFollowers, vs...))
+}
+
+// FollowersNotIn applies the NotIn predicate on the "followers" field.
+func FollowersNotIn(vs ...int) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldFollowers, vs...))
+}
+
+// FollowersGT applies the GT predicate on the "followers" field.
+func FollowersGT(v int) predicate.User {
+	return predicate.User(sql.FieldGT(FieldFollowers, v))
+}
+
+// FollowersGTE applies the GTE predicate on the "followers" field.
+func FollowersGTE(v int) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldFollowers, v))
+}
+
+// FollowersLT applies the LT predicate on the "followers" field.
+func FollowersLT(v int) predicate.User {
+	return predicate.User(sql.FieldLT(FieldFollowers, v))
+}
+
+// FollowersLTE applies the LTE predicate on the "followers" field.
+func FollowersLTE(v int) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldFollowers, v))
+}
+
+// FollowersIsNil applies the IsNil predicate on the "followers" field.
+func FollowersIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldFollowers))
+}
+
+// FollowersNotNil applies the NotNil predicate on the "followers" field.
+func FollowersNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldFollowers))
 }
 
 // HasBlogPosts applies the HasEdge predicate on the "blog_posts" edge.

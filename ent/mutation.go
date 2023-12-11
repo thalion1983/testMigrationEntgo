@@ -539,6 +539,8 @@ type UserMutation struct {
 	name              *string
 	email             *string
 	title             *string
+	followers         *int
+	addfollowers      *int
 	clearedFields     map[string]struct{}
 	blog_posts        map[int]struct{}
 	removedblog_posts map[int]struct{}
@@ -767,6 +769,76 @@ func (m *UserMutation) ResetTitle() {
 	delete(m.clearedFields, user.FieldTitle)
 }
 
+// SetFollowers sets the "followers" field.
+func (m *UserMutation) SetFollowers(i int) {
+	m.followers = &i
+	m.addfollowers = nil
+}
+
+// Followers returns the value of the "followers" field in the mutation.
+func (m *UserMutation) Followers() (r int, exists bool) {
+	v := m.followers
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFollowers returns the old "followers" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldFollowers(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFollowers is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFollowers requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFollowers: %w", err)
+	}
+	return oldValue.Followers, nil
+}
+
+// AddFollowers adds i to the "followers" field.
+func (m *UserMutation) AddFollowers(i int) {
+	if m.addfollowers != nil {
+		*m.addfollowers += i
+	} else {
+		m.addfollowers = &i
+	}
+}
+
+// AddedFollowers returns the value that was added to the "followers" field in this mutation.
+func (m *UserMutation) AddedFollowers() (r int, exists bool) {
+	v := m.addfollowers
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearFollowers clears the value of the "followers" field.
+func (m *UserMutation) ClearFollowers() {
+	m.followers = nil
+	m.addfollowers = nil
+	m.clearedFields[user.FieldFollowers] = struct{}{}
+}
+
+// FollowersCleared returns if the "followers" field was cleared in this mutation.
+func (m *UserMutation) FollowersCleared() bool {
+	_, ok := m.clearedFields[user.FieldFollowers]
+	return ok
+}
+
+// ResetFollowers resets all changes to the "followers" field.
+func (m *UserMutation) ResetFollowers() {
+	m.followers = nil
+	m.addfollowers = nil
+	delete(m.clearedFields, user.FieldFollowers)
+}
+
 // AddBlogPostIDs adds the "blog_posts" edge to the Blog entity by ids.
 func (m *UserMutation) AddBlogPostIDs(ids ...int) {
 	if m.blog_posts == nil {
@@ -855,7 +927,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
 	}
@@ -864,6 +936,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.title != nil {
 		fields = append(fields, user.FieldTitle)
+	}
+	if m.followers != nil {
+		fields = append(fields, user.FieldFollowers)
 	}
 	return fields
 }
@@ -879,6 +954,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldTitle:
 		return m.Title()
+	case user.FieldFollowers:
+		return m.Followers()
 	}
 	return nil, false
 }
@@ -894,6 +971,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldTitle:
 		return m.OldTitle(ctx)
+	case user.FieldFollowers:
+		return m.OldFollowers(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -924,6 +1003,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTitle(v)
 		return nil
+	case user.FieldFollowers:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFollowers(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
@@ -931,13 +1017,21 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addfollowers != nil {
+		fields = append(fields, user.FieldFollowers)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case user.FieldFollowers:
+		return m.AddedFollowers()
+	}
 	return nil, false
 }
 
@@ -946,6 +1040,13 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldFollowers:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFollowers(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }
@@ -956,6 +1057,9 @@ func (m *UserMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(user.FieldTitle) {
 		fields = append(fields, user.FieldTitle)
+	}
+	if m.FieldCleared(user.FieldFollowers) {
+		fields = append(fields, user.FieldFollowers)
 	}
 	return fields
 }
@@ -974,6 +1078,9 @@ func (m *UserMutation) ClearField(name string) error {
 	case user.FieldTitle:
 		m.ClearTitle()
 		return nil
+	case user.FieldFollowers:
+		m.ClearFollowers()
+		return nil
 	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
@@ -990,6 +1097,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldTitle:
 		m.ResetTitle()
+		return nil
+	case user.FieldFollowers:
+		m.ResetFollowers()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

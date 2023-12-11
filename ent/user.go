@@ -22,6 +22,8 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
+	// Followers holds the value of the "followers" field.
+	Followers int `json:"followers,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -51,7 +53,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
+		case user.FieldID, user.FieldFollowers:
 			values[i] = new(sql.NullInt64)
 		case user.FieldName, user.FieldEmail, user.FieldTitle:
 			values[i] = new(sql.NullString)
@@ -93,6 +95,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
 				u.Title = value.String
+			}
+		case user.FieldFollowers:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field followers", values[i])
+			} else if value.Valid {
+				u.Followers = int(value.Int64)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -143,6 +151,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(u.Title)
+	builder.WriteString(", ")
+	builder.WriteString("followers=")
+	builder.WriteString(fmt.Sprintf("%v", u.Followers))
 	builder.WriteByte(')')
 	return builder.String()
 }

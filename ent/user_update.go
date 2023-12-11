@@ -76,6 +76,33 @@ func (uu *UserUpdate) ClearTitle() *UserUpdate {
 	return uu
 }
 
+// SetFollowers sets the "followers" field.
+func (uu *UserUpdate) SetFollowers(i int) *UserUpdate {
+	uu.mutation.ResetFollowers()
+	uu.mutation.SetFollowers(i)
+	return uu
+}
+
+// SetNillableFollowers sets the "followers" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableFollowers(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetFollowers(*i)
+	}
+	return uu
+}
+
+// AddFollowers adds i to the "followers" field.
+func (uu *UserUpdate) AddFollowers(i int) *UserUpdate {
+	uu.mutation.AddFollowers(i)
+	return uu
+}
+
+// ClearFollowers clears the value of the "followers" field.
+func (uu *UserUpdate) ClearFollowers() *UserUpdate {
+	uu.mutation.ClearFollowers()
+	return uu
+}
+
 // AddBlogPostIDs adds the "blog_posts" edge to the Blog entity by IDs.
 func (uu *UserUpdate) AddBlogPostIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddBlogPostIDs(ids...)
@@ -164,6 +191,15 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.TitleCleared() {
 		_spec.ClearField(user.FieldTitle, field.TypeString)
+	}
+	if value, ok := uu.mutation.Followers(); ok {
+		_spec.SetField(user.FieldFollowers, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedFollowers(); ok {
+		_spec.AddField(user.FieldFollowers, field.TypeInt, value)
+	}
+	if uu.mutation.FollowersCleared() {
+		_spec.ClearField(user.FieldFollowers, field.TypeInt)
 	}
 	if uu.mutation.BlogPostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -275,6 +311,33 @@ func (uuo *UserUpdateOne) SetNillableTitle(s *string) *UserUpdateOne {
 // ClearTitle clears the value of the "title" field.
 func (uuo *UserUpdateOne) ClearTitle() *UserUpdateOne {
 	uuo.mutation.ClearTitle()
+	return uuo
+}
+
+// SetFollowers sets the "followers" field.
+func (uuo *UserUpdateOne) SetFollowers(i int) *UserUpdateOne {
+	uuo.mutation.ResetFollowers()
+	uuo.mutation.SetFollowers(i)
+	return uuo
+}
+
+// SetNillableFollowers sets the "followers" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableFollowers(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetFollowers(*i)
+	}
+	return uuo
+}
+
+// AddFollowers adds i to the "followers" field.
+func (uuo *UserUpdateOne) AddFollowers(i int) *UserUpdateOne {
+	uuo.mutation.AddFollowers(i)
+	return uuo
+}
+
+// ClearFollowers clears the value of the "followers" field.
+func (uuo *UserUpdateOne) ClearFollowers() *UserUpdateOne {
+	uuo.mutation.ClearFollowers()
 	return uuo
 }
 
@@ -396,6 +459,15 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.TitleCleared() {
 		_spec.ClearField(user.FieldTitle, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Followers(); ok {
+		_spec.SetField(user.FieldFollowers, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedFollowers(); ok {
+		_spec.AddField(user.FieldFollowers, field.TypeInt, value)
+	}
+	if uuo.mutation.FollowersCleared() {
+		_spec.ClearField(user.FieldFollowers, field.TypeInt)
 	}
 	if uuo.mutation.BlogPostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -46,6 +46,20 @@ func (uc *UserCreate) SetNillableTitle(s *string) *UserCreate {
 	return uc
 }
 
+// SetFollowers sets the "followers" field.
+func (uc *UserCreate) SetFollowers(i int) *UserCreate {
+	uc.mutation.SetFollowers(i)
+	return uc
+}
+
+// SetNillableFollowers sets the "followers" field if the given value is not nil.
+func (uc *UserCreate) SetNillableFollowers(i *int) *UserCreate {
+	if i != nil {
+		uc.SetFollowers(*i)
+	}
+	return uc
+}
+
 // AddBlogPostIDs adds the "blog_posts" edge to the Blog entity by IDs.
 func (uc *UserCreate) AddBlogPostIDs(ids ...int) *UserCreate {
 	uc.mutation.AddBlogPostIDs(ids...)
@@ -138,6 +152,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Title(); ok {
 		_spec.SetField(user.FieldTitle, field.TypeString, value)
 		_node.Title = value
+	}
+	if value, ok := uc.mutation.Followers(); ok {
+		_spec.SetField(user.FieldFollowers, field.TypeInt, value)
+		_node.Followers = value
 	}
 	if nodes := uc.mutation.BlogPostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

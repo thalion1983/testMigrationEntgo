@@ -18,6 +18,8 @@ const (
 	FieldEmail = "email"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// FieldFollowers holds the string denoting the followers field in the database.
+	FieldFollowers = "followers"
 	// EdgeBlogPosts holds the string denoting the blog_posts edge name in mutations.
 	EdgeBlogPosts = "blog_posts"
 	// Table holds the table name of the user in the database.
@@ -37,6 +39,7 @@ var Columns = []string{
 	FieldName,
 	FieldEmail,
 	FieldTitle,
+	FieldFollowers,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -70,6 +73,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByFollowers orders the results by the followers field.
+func ByFollowers(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFollowers, opts...).ToFunc()
 }
 
 // ByBlogPostsCount orders the results by blog_posts count.

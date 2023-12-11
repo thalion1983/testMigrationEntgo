@@ -17,6 +17,7 @@ func (User) Fields() []ent.Field {
 		field.String("name"),
 		field.String("email").Unique(),
 		field.String("title").Optional(),
+		field.Int("followers").Optional(),
 	}
 }
 
